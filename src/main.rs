@@ -4,6 +4,8 @@ use std::{thread::sleep, time::Duration};
 
 use clipboard_win::{formats, get_clipboard, set_clipboard};
 
+mod handlers;
+
 fn main() {
   loop {
     sleep(Duration::from_secs(1));
@@ -23,43 +25,24 @@ fn main() {
     let domain = url_parts[2].replace("www.", "");
     let path = &url_parts[3..];
 
-    let new_clipboard = match domain.as_str() {
-      "amazon.com" => {
-        if path[0] == "dp" {
-          let product_id = path[1].split("?").collect::<Vec<&str>>()[0];
+    let mut new_clipboard = None;
 
-          format!("https://www.amazon.com/dp/{}", product_id)
-        } else {
-          let product_id_index = path.iter().position(|&r| r == "dp").unwrap() + 1;
-          let product_id = path[product_id_index].to_string().split("?").collect::<Vec<&str>>()[0].to_string();
+    for handler in handlers::HANDLERS {
+      if handler.get_domain() == domain {
+        println!("Running handler for {}", domain);
 
-          format!("https://www.amazon.com/dp/{}", product_id)
-        }
+        new_clipboard = handler.handle(path);
+        break;
       }
-      "youtube.com" => {
-        if path.len() != 1 || !path[0].starts_with("watch?v=") {
-          continue;
-        }
+    }
 
-        let video_id = path[0].replace("watch?v=", "");
+    if new_clipboard.is_none() {
+      continue;
+    }
 
-        format!("https://youtu.be/{}", video_id)
-      }
-      "reddit.com" => {
-        if path.len() <= 4 || path[0] != "r" || path[2] != "comments" || (path.len() == 6 && path[4] == "comment") {
-          continue;
-        }
+    let new_clipboard = new_clipboard.unwrap();
 
-        if path.len() >= 6 && path[4] == "comment" {
-          format!("https://www.reddit.com/r/{}/comments/{}/comment/{}", path[1], path[3], path[5])
-        } else {
-          format!("https://www.reddit.com/r/{}/comments/{}", path[1], path[3])
-        }
-      }
-      _ => "".to_string(),
-    };
-
-    if new_clipboard.is_empty() {
+    if new_clipboard == clipboard {
       continue;
     }
 

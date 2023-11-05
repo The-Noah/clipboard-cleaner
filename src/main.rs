@@ -25,23 +25,23 @@ fn main() {
 
     let new_clipboard = match domain.as_str() {
       "amazon.com" => {
-        if url_parts[3] == "dp" {
-          let product_id = url_parts[4].split("?").collect::<Vec<&str>>()[0];
+        if path[0] == "dp" {
+          let product_id = path[1].split("?").collect::<Vec<&str>>()[0];
 
           format!("https://www.amazon.com/dp/{}", product_id)
         } else {
-          let product_id_index = url_parts.iter().position(|&r| r == "dp").unwrap() + 1;
-          let product_id = url_parts[product_id_index].to_string().split("?").collect::<Vec<&str>>()[0].to_string();
+          let product_id_index = path.iter().position(|&r| r == "dp").unwrap() + 1;
+          let product_id = path[product_id_index].to_string().split("?").collect::<Vec<&str>>()[0].to_string();
 
           format!("https://www.amazon.com/dp/{}", product_id)
         }
       }
       "youtube.com" => {
-        if url_parts.len() != 4 || !url_parts[3].starts_with("watch?v=") {
+        if path.len() != 1 || !path[0].starts_with("watch?v=") {
           continue;
         }
 
-        let video_id = url_parts[3].replace("watch?v=", "");
+        let video_id = path[0].replace("watch?v=", "");
 
         format!("https://youtu.be/{}", video_id)
       }

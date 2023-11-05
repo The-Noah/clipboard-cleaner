@@ -21,6 +21,7 @@ fn main() {
     }
 
     let domain = url_parts[2].replace("www.", "");
+    let path = &url_parts[3..];
 
     let new_clipboard = match domain.as_str() {
       "amazon.com" => {
@@ -43,6 +44,17 @@ fn main() {
         let video_id = url_parts[3].replace("watch?v=", "");
 
         format!("https://youtu.be/{}", video_id)
+      }
+      "reddit.com" => {
+        if path.len() <= 4 || path[0] != "r" || path[2] != "comments" || (path.len() == 6 && path[4] == "comment") {
+          continue;
+        }
+
+        if path.len() >= 6 && path[4] == "comment" {
+          format!("https://www.reddit.com/r/{}/comments/{}/comment/{}", path[1], path[3], path[5])
+        } else {
+          format!("https://www.reddit.com/r/{}/comments/{}", path[1], path[3])
+        }
       }
       _ => "".to_string(),
     };

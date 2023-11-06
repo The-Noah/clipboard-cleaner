@@ -19,3 +19,48 @@ impl Handler for RedditHandler {
     })
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_homepage() {
+    let handler = RedditHandler {};
+    let url = "https://www.reddit.com/";
+    let path = &url.split("/").collect::<Vec<&str>>()[3..];
+
+    let result = handler.handle(&path);
+    assert_eq!(result, None);
+  }
+
+  #[test]
+  fn test_subreddit() {
+    let handler = RedditHandler {};
+    let url = "https://www.reddit.com/r/ProgrammerHumor/";
+    let path = &url.split("/").collect::<Vec<&str>>()[3..];
+
+    let result = handler.handle(&path);
+    assert_eq!(result, None);
+  }
+
+  #[test]
+  fn test_post() {
+    let handler = RedditHandler {};
+    let url = "https://www.reddit.com/r/ProgrammerHumor/comments/17oip80/thisismyworstdream/?utm_source=share&utm_medium=web2x&context=3";
+    let path = &url.split("/").collect::<Vec<&str>>()[3..];
+
+    let result = handler.handle(&path);
+    assert_eq!(result, Some("https://www.reddit.com/r/ProgrammerHumor/comments/17oip80".to_string()));
+  }
+
+  #[test]
+  fn test_comment() {
+    let handler = RedditHandler {};
+    let url = "https://www.reddit.com/r/ProgrammerHumor/comments/17oip80/comment/k7yph09/?utm_source=share&utm_medium=web2x&context=3";
+    let path = &url.split("/").collect::<Vec<&str>>()[3..];
+
+    let result = handler.handle(&path);
+    assert_eq!(result, Some("https://www.reddit.com/r/ProgrammerHumor/comments/17oip80/comment/k7yph09".to_string()));
+  }
+}

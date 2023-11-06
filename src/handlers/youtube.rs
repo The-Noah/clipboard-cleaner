@@ -17,3 +17,28 @@ impl Handler for YouTubeHandler {
     Some(format!("https://youtu.be/{}", video_id))
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_homepage() {
+    let handler = YouTubeHandler {};
+    let url = "https://www.youtube.com/";
+    let path = &url.split("/").collect::<Vec<&str>>()[3..];
+
+    let result = handler.handle(&path);
+    assert_eq!(result, None);
+  }
+
+  #[test]
+  fn test_video() {
+    let handler = YouTubeHandler {};
+    let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+    let path = &url.split("/").collect::<Vec<&str>>()[3..];
+
+    let result = handler.handle(&path);
+    assert_eq!(result, Some("https://youtu.be/dQw4w9WgXcQ".to_string()));
+  }
+}

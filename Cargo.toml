@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 clipboard-win = "4.5.0"
+image = "0.24.7"
+tao = "0.23.0"
+tray-icon = "0.10.0"
